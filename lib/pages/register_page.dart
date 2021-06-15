@@ -1,8 +1,11 @@
+import 'package:chat/helpers/mostrar_Alerta.dart';
+import 'package:chat/services/auth_service.dart';
 import 'package:chat/widgets/custom_button.dart';
 import 'package:chat/widgets/custom_input.dart';
 import 'package:chat/widgets/custom_labels.dart';
 import 'package:chat/widgets/custom_logo.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatelessWidget {
   @override
@@ -19,7 +22,11 @@ class RegisterPage extends StatelessWidget {
               children: [
                 CustomLogo(title: 'Registrar'),
                 _Form(),
-                CustomLabels(ruta: 'login',title:'Inicia Sesión', pregunta: '¿Ya tienes cuenta?',),
+                CustomLabels(
+                  ruta: 'login',
+                  title: 'Inicia Sesión',
+                  pregunta: '¿Ya tienes cuenta?',
+                ),
                 Text('Términos y condiciones de uso',
                     style: TextStyle(fontWeight: FontWeight.w200))
               ],
@@ -48,6 +55,7 @@ class __FormState extends State<_Form> {
       shape: StadiumBorder(),
       textStyle: const TextStyle(fontSize: 20),
     );
+    final authService = Provider.of<AuthService>(context);
 
     return Container(
       margin: EdgeInsets.only(top: 40),
@@ -60,10 +68,10 @@ class __FormState extends State<_Form> {
             textController: nameCtrl,
           ),
           CustomInput(
-            icon: Icons.perm_identity,
+            icon: Icons.email_outlined,
             placeHolder: 'Correo',
             keyboardType: TextInputType.emailAddress,
-            textController: nameCtrl,
+            textController: emailCtrl,
           ),
           CustomInput(
             icon: Icons.lock_outline,
@@ -73,11 +81,24 @@ class __FormState extends State<_Form> {
           ),
           CustomButton(
             style: style,
-            title: 'Registrar',
-            onPressed: () {
-              print('Correo ${emailCtrl.text}');
-              print('Correo ${passCtrl.text}');
-            },
+            title: 'Crear cuenta',
+            onPressed: authService.autenticando
+                ? null
+                : () async {
+                    FocusScope.of(context).unfocus();
+                    final register = await authService.register(
+                        nameCtrl.text.trim(),
+                        emailCtrl.text.trim(),
+                        passCtrl.text.trim());
+                    if (register.ok) {
+                      //Navegar a otra pantalla
+                      Navigator.pushReplacementNamed(context, 'usuarios');
+                    } else {
+                      //Mostrar Alerta
+                      mostrarALerta(context, 'Registro Incorrecto',
+                         register.msg);
+                    }
+                  },
           ),
         ],
       ),
