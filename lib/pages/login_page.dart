@@ -1,5 +1,6 @@
 import 'package:chat/helpers/mostrar_Alerta.dart';
 import 'package:chat/services/auth_service.dart';
+import 'package:chat/services/socket_service.dart';
 import 'package:chat/widgets/custom_button.dart';
 import 'package:chat/widgets/custom_input.dart';
 import 'package:chat/widgets/custom_labels.dart';
@@ -50,6 +51,7 @@ class __FormState extends State<_Form> {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
+    final socketService = Provider.of<SocketService>(context);
 
     final ButtonStyle style = ElevatedButton.styleFrom(
       primary: Colors.blue,
@@ -83,6 +85,8 @@ class __FormState extends State<_Form> {
                     FocusScope.of(context).unfocus();
                     final loginOk = await authService.login(emailCtrl.text.trim(), passCtrl.text.trim());
                     if(loginOk){
+                      //Connect to socket
+                      socketService.connect();
                       //Navegar a otra pantalla
                       Navigator.pushReplacementNamed(context, 'usuarios');
                     }else{

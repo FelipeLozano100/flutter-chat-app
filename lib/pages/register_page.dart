@@ -1,5 +1,6 @@
 import 'package:chat/helpers/mostrar_Alerta.dart';
 import 'package:chat/services/auth_service.dart';
+import 'package:chat/services/socket_service.dart';
 import 'package:chat/widgets/custom_button.dart';
 import 'package:chat/widgets/custom_input.dart';
 import 'package:chat/widgets/custom_labels.dart';
@@ -56,6 +57,7 @@ class __FormState extends State<_Form> {
       textStyle: const TextStyle(fontSize: 20),
     );
     final authService = Provider.of<AuthService>(context);
+    final socketService = Provider.of<SocketService>(context);
 
     return Container(
       margin: EdgeInsets.only(top: 40),
@@ -92,11 +94,12 @@ class __FormState extends State<_Form> {
                         passCtrl.text.trim());
                     if (register.ok) {
                       //Navegar a otra pantalla
+                      socketService.connect();
                       Navigator.pushReplacementNamed(context, 'usuarios');
                     } else {
                       //Mostrar Alerta
-                      mostrarALerta(context, 'Registro Incorrecto',
-                         register.msg);
+                      mostrarALerta(
+                          context, 'Registro Incorrecto', register.msg);
                     }
                   },
           ),
